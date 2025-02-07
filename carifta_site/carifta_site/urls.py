@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+	# this means that on the root url, it will reference the urls.py file in the webApp directory to know which function to run
 	path('', include('webApp.urls')),
     path('admin/', admin.site.urls),
 ]
