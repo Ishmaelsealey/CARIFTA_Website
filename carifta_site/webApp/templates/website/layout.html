@@ -1,0 +1,25 @@
+<!-- this is the base frontend template -->
+{# anything outside of a {% %} block is part of the base template #}
+
+{% load static %}
+<!-- The line above loads any files that are in the static folder (this includes css) -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- since the stylesheet is in the static folder, you use that notation to reference it -->
+	<link rel="stylesheet" href="{% static 'website/styles.css' %}">
+
+	<title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+	{% block body %}
+
+		{# Do not add anything in the body block in THIS file. do so on a file that uses the template #}
+	
+	{% endblock %}
+</body>
+</html>
