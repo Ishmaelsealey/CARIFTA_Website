@@ -7,3 +7,10 @@ from django import forms
 # index function is used to show a specific file when it is called
 def index(request):
 	return render(request, 'website/index.html')
+
+# login function
+
+# return HttpResponse('Testing 123')
+
+
+# user account function
