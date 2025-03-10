@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event List</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h2>Event List</h2>
+
+    <!-- Filters and Search Form -->
+    
+		<form method="get">
+    <!-- Age Filter -->
+    <label for="age">Age Group:</label>
+    <select name="age">
+        <option value="">All</option>
+        {% for value, label in age_choices %}
+        <option value="{{ value }}" {% if value == age_filter %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- Gender Filter -->
+    <label for="gender">Gender:</label>
+    <select name="gender">
+        <option value="">All</option>
+        <option value="MALE" {% if gender_filter == 'MALE' %}selected{% endif %}>Male</option>
+        <option value="FEMALE" {% if gender_filter == 'FEMALE' %}selected{% endif %}>Female</option>
+    </select>
+
+    <!-- Season Filter -->
+    <label for="season">Season:</label>
+    <select name="season">
+        <option value="">All</option>
+        {% for value, label in season_choices %}
+        <option value="{{ value }}" {% if value == season_filter %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- Event Filter -->
+    <label for="event">Event:</label>
+    <select name="event">
+        <option value="">All</option>
+        {% for value, label in event_choices %}
+        <option value="{{ value }}" {% if value == event_filter %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- Athlete Search -->
+    <label for="athlete">Search Athlete:</label>
+    <input type="text" name="athlete" value="{{ athlete_search }}">
+
+    <button type="submit">Filter</button>
+</form>
+
+<!-- Display matches in a table -->
+<table>
+    <thead>
+        <tr>
+            <th>Event</th>
+            <th>Athlete</th>
+            <th>Club</th>
+            <th>Place</th>
+            <th>Season</th>
+            <th>Mark</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for match in matches %}
+        <tr>
+            <td>{{ match.event.eventName }}</td>
+            <td>{{ match.athlete.name }}</td>
+            <td>{{ match.athlete.club }}</td>
+            <td>{{ match.place }}</td>
+            <td>{{ match.season }}</td>
+            <td>{{ match.mark }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+</body>
+</html>
