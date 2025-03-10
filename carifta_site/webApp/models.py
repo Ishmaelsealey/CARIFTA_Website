@@ -3,13 +3,18 @@ from django.db import models
 # Create your models here.
 
 class Athlete(models.Model):
+	GENDER = [
+		("MALE", "Male"),
+		("FEMALE", "Female")
+	]
+
 	athleteID = models.AutoField(primary_key=True)
 	name = models.CharField(max_length= 100)
 	email = models.EmailField(max_length=200)
-	gender = models.CharField(max_length=2)
+	gender = models.CharField(max_length=6, choices=GENDER)
 	weight = models.DecimalField(max_digits=6, decimal_places=2)
 	biography = models.CharField(max_length=1000)
-	smLinks = models.CharField(max_length=500)
+	smLinks = models.URLField(max_length=500)
 	height = models.DecimalField(max_digits=4, decimal_places=2)
 	dob = models.DateField(auto_now=False,auto_now_add=False)
 	# matches = models.ForeignKey(Match, on_delete=models.CASCADE)
@@ -65,6 +70,21 @@ class Match(models.Model):
 		("80H", "80 Hurdles"),
 		("BT", "Ball Throw"),
 	]
+	
+	GENDER = [
+		("MALE", "Male"),
+		("FEMALE", "Female")
+	]
+
+	SEASON = [
+		(2025, "2025"),
+		(2024, "2024"),
+		(2023, "2023"),
+		(2022, "2022"),
+		(2021, "2021"),
+		(2020, "2020"),
+		(2019, "2019"),
+	]
 
 	matchID = models.AutoField(primary_key=True)
 	windSpeed = models.DecimalField(max_digits=6, decimal_places=3)
@@ -72,20 +92,26 @@ class Match(models.Model):
 	club = models.CharField(max_length=200)
 	date = models.DateField(auto_now=False, auto_now_add=False)
 	location = models.CharField(max_length=200)
-	eventName = models.CharField(max_length=200)
-	season = models.CharField(max_length=200)
-	mark = models.CharField(max_length=10, choices=EVENTS)
+	eventName = models.CharField(max_length=200, choices=EVENTS)
+	season = models.IntegerField(choices=SEASON)
+	mark = models.CharField(max_length=10)
 	age = models.CharField(max_length=5, choices=AGES)
 	personalBest = models.DecimalField(max_digits=10, decimal_places=2)
+	gender = models.CharField(max_length=6, choices=GENDER, default="MALE")
 
 	def __str__(self):
 		return f"Event: {self.eventName}"  # Displays the event's name
 		
 class Coach(models.Model):
+	GENDER = [
+		("MALE", "Male"),
+		("FEMALE", "Female")
+	]
+
 	coachID = models.AutoField(primary_key=True)
 	name = models.CharField(max_length= 100)
 	email = models.EmailField(max_length=200)
-	gender = models.CharField(max_length=2)
+	gender = models.CharField(max_length=6, choices=GENDER)
 
 	def __str__(self):
 		return f"Coach: {self.name}"  # Displays the coach's name
