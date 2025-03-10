@@ -77,6 +77,9 @@ class Match(models.Model):
 	mark = models.CharField(max_length=10, choices=EVENTS)
 	age = models.CharField(max_length=5, choices=AGES)
 	personalBest = models.DecimalField(max_digits=10, decimal_places=2)
+
+	def __str__(self):
+		return f"Event: {self.eventName}"  # Displays the event's name
 		
 class Coach(models.Model):
 	coachID = models.AutoField(primary_key=True)
