@@ -3,7 +3,8 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from .models import Match, Event, Athlete
-from .forms import MatchForm
+from .forms import MatchForm, SignupForm
+from django.contrib.auth import get_user_model
 
 # Create your views here. each function is a different view/screen
 
@@ -12,11 +13,11 @@ def athlete_login(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
+        athlete = authenticate(request, username=username, password=password)
         
-        if user is not None:
-            login(request, user)
-            return redirect('match_list')  # Redirect to athlete's match list page
+        if athlete is not None:
+            login(request, athlete)
+            return redirect('athlete_matches')  # Redirect to athlete's match list page
         else:
             return render(request, 'website/login.html', {'error': 'Invalid credentials'})
 
@@ -25,14 +26,25 @@ def athlete_login(request):
 # View for Athlete Account Creation
 def athlete_signup(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = SignupForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('match_list')  # Redirect after successful signup
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            password1 = form.cleaned_data['password1']
+            password2 = form.cleaned_data['password2']
+            
+            if password1 == password2:
+                user = get_user_model().objects.create_user(
+                    email=email,
+                    username=username,
+                    password=password1
+                )
+                login(request, user)
+                return redirect('dashboard')
+            else:
+                return render(request, 'website/signup.html', {'error': 'Passwords do not match'})
     else:
-        form = UserCreationForm()
-
+        form = SignupForm()
     return render(request, 'website/signup.html', {'form': form})
 
 # matches table function
