@@ -17,7 +17,6 @@ class Athlete(models.Model):
     smLinks = models.URLField(max_length=500)
     height = models.DecimalField(max_digits=4, decimal_places=2)
     dob = models.DateField(auto_now=False, auto_now_add=False)
-    club = models.CharField(max_length=200, default=None, blank=True, null=True)  # Athlete's club name
 
     def __str__(self):
         return f"Athlete: {self.name}"  # Displays the athlete's name
@@ -101,6 +100,7 @@ class Match(models.Model):
     location = models.CharField(max_length=200)
     mark = models.CharField(max_length=10)
     age = models.CharField(max_length=5, choices=AGES)
+    club = models.CharField(max_length=200, default=None, blank=True, null=True)  # The club name the athlete performed under for a match
     personalBest = models.DecimalField(max_digits=10, decimal_places=2)
     season = models.IntegerField(choices=SEASON)
     gender = models.CharField(max_length=6, choices=Athlete.GENDER, default="MALE")  # Match gender (can be different from athlete)
