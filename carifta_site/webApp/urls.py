@@ -4,6 +4,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-	# References the index function in the views.py file
-	path("", views.index, name="index"),
+	path('events/', views.event_list, name='event_list'),
+	path('athlete/matches/', views.athlete_matches, name='athlete_matches'),
+	path('login/', views.athlete_login, name='login'),
+	path('signup/', views.athlete_signup, name='signup'),
 ]
