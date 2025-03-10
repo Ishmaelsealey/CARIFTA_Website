@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Athlete Sign Up</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body>
+{% extends "website/layout.html" %}
+
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
     <div class="container">
         <h2>Athlete Sign Up</h2>
         <form method="POST">
@@ -38,5 +36,4 @@
 
         <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
     </div>
-</body>
-</html>
+{% endblock %}
