@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from .models import Match, Event, Athlete
 from .forms import MatchForm, SignupForm
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, logout
 
 # Create your views here. each function is a different view/screen
 
@@ -46,6 +46,42 @@ def athlete_signup(request):
     else:
         form = SignupForm()
     return render(request, 'website/signup.html', {'form': form})
+
+def athlete_signup(request):
+    if request.method == "POST":
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            # Extract the valid form data
+            username = form.cleaned_data["username"]
+            email = form.cleaned_data["email"]
+            password = form.cleaned_data["password1"]
+            gender = form.cleaned_data["gender"]
+            weight = form.cleaned_data["weight"]
+            height = form.cleaned_data["height"]
+            dob = form.cleaned_data["dob"]
+            biography = form.cleaned_data.get("biography", "")
+            smLinks = form.cleaned_data.get("smLinks", "")
+
+            # Create user with required fields
+            user = Athlete.objects.create_user(
+                email=email,
+                username=username,
+                gender=gender,
+                weight=weight,
+                height=height,
+                dob=dob,
+                password=password,
+                biography=biography,
+                smLinks=smLinks,
+            )
+
+            login(request, user)  # Log the user in after signup
+            return redirect('athlete_matches')  # Redirect to home page or dashboard
+
+    else:
+        form = SignupForm()
+
+    return render(request, 'website/signup.html', {"form": form})
 
 # matches table function
 
@@ -93,7 +129,7 @@ def event_list(request):
 @login_required
 def athlete_matches(request):
   # Get the athlete's matches
-	athlete = request.user.athlete  # Assuming the user model has a related 'athlete'
+	athlete = request.user  # Assuming the user model has a related 'athlete'
 	matches = Match.objects.filter(athlete=athlete)
 
 	# Add a match
@@ -109,3 +145,7 @@ def athlete_matches(request):
 		form = MatchForm()
 
 	return render(request, 'website/athlete_matches.html', {'matches': matches, 'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')  # Redirect to the login page or homepage after logout
