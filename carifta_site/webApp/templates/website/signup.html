@@ -7,7 +7,7 @@
 {% block body %}
     <div class="container">
         <h2>Athlete Sign Up</h2>
-        <form method="POST">
+        <!-- <form method="POST">
             {% csrf_token %}
             <div class="form-group">
                 <label for="name">Full Name</label>
@@ -67,6 +67,13 @@
                 <input type="password" id="password2" name="password2" required class="form-control">
             </div>
             <button type="submit" class="btn btn-primary">Sign Up</button>
+        </form> -->
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button type="submit">Sign Up</button>
         </form>
 
         {% if form.errors %}

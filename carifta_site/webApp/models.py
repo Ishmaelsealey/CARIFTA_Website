@@ -1,74 +1,22 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import User
 
-class AthleteManager(BaseUserManager):
-    """Manager for Athlete model"""
-    
-    def create_user(self, email, username, gender, weight, height, dob, password=None, **extra_fields):
-        """Create and return a regular athlete with required fields"""
-        if not email:
-            raise ValueError(_('The Email field must be set'))
-        if not username:
-            raise ValueError(_('The Username field must be set'))
-
-        email = self.normalize_email(email)
-        user = self.model(
-            email=email,
-            username=username,
-            gender=gender,
-            weight=weight,
-            height=height,
-            dob=dob,
-            **extra_fields
-        )
-        user.set_password(password)  # Hash password
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email, username, gender, weight, height, dob, password=None, **extra_fields):
-        """Create and return a superuser with required fields"""
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        
-        return self.create_user(email, username, gender, weight, height, dob, password, **extra_fields)
-
-class Athlete(AbstractBaseUser, PermissionsMixin):
+class AthleteProfile(models.Model):
     GENDER = [
         ("MALE", "Male"),
         ("FEMALE", "Female")
     ]
 
-    athleteID = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    username = models.CharField(max_length=100, unique=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     gender = models.CharField(max_length=6, choices=GENDER)
     weight = models.DecimalField(max_digits=6, decimal_places=2)
     height = models.DecimalField(max_digits=4, decimal_places=2)
     dob = models.DateField()
-    
-    # Optional fields
     biography = models.CharField(max_length=1000, blank=True, null=True)
     smLinks = models.URLField(max_length=500, blank=True, null=True)
 
-    # Authentication fields
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)  # True if the athlete is a staff (admin)
-
-    objects = AthleteManager()
-
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['name', 'email', 'gender', 'weight', 'height', 'dob']  # These must be provided
-
     def __str__(self):
-        return f"Athlete: {self.username}"  
-
-    def get_full_name(self):
-        return self.username
-
-    def get_short_name(self):
-        return self.username
+        return f"{self.user.username}'s Profile"
 
 class Event(models.Model):
     EVENTS = [
@@ -112,10 +60,10 @@ class Event(models.Model):
 
     eventID = models.AutoField(primary_key=True)
     eventName = models.CharField(max_length=200, choices=EVENTS)
-    description = models.TextField(blank=True, null=True)  # Optional event description
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return self.eventName  # Displays the event's name
+        return self.eventName
 
 class Match(models.Model):
     AGES = [
@@ -141,20 +89,18 @@ class Match(models.Model):
     ]
 
     matchID = models.AutoField(primary_key=True)
-    athlete = models.ForeignKey(Athlete, on_delete=models.CASCADE, related_name="matches", null=True)  # ForeignKey to Athlete
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="matches", null=True)  # ForeignKey to Event
+    athlete = models.ForeignKey(User, on_delete=models.CASCADE, related_name="matches", null=True)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="matches", null=True)
     windSpeed = models.DecimalField(max_digits=3, decimal_places=1)
     place = models.CharField(max_length=200)
     date = models.DateField()
     location = models.CharField(max_length=200)
     mark = models.CharField(max_length=10)
     age = models.CharField(max_length=5, choices=AGES)
-    club = models.CharField(max_length=200, default=None, blank=True, null=True)  # The club name the athlete performed under for a match
+    club = models.CharField(max_length=200, default=None, blank=True, null=True)
     personalBest = models.DecimalField(max_digits=10, decimal_places=2)
     season = models.IntegerField(choices=SEASON)
-    gender = models.CharField(max_length=6, choices=Athlete.GENDER, default="MALE")  # Match gender (can be different from athlete)
+    gender = models.CharField(max_length=6, choices=AthleteProfile.GENDER, default="MALE")
 
     def __str__(self):
-        athlete_name = self.athlete.name if self.athlete else "No Athlete"
-        event_name = self.event.eventName if self.event else "No Event"
-        return f"Match: {athlete_name} - {event_name}"
+        return f"Match: {self.athlete.username} - {self.event.eventName}"

@@ -1,93 +1,67 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from .models import Match, Event, Athlete
+from django.contrib.auth.models import User
+from .models import Match, Event, AthleteProfile
 from .forms import MatchForm, SignupForm
-from django.contrib.auth import get_user_model, logout
 
-# Create your views here. each function is a different view/screen
-
-# View for Athlete Login
-def athlete_login(request):
+# View for User Login
+def user_login(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        athlete = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=username, password=password)
         
-        if athlete is not None:
-            login(request, athlete)
-            return redirect('athlete_matches')  # Redirect to athlete's match list page
+        if user is not None:
+            login(request, user)
+            return redirect('athlete_matches')  # Redirect to match list page
         else:
             return render(request, 'website/login.html', {'error': 'Invalid credentials'})
 
     return render(request, 'website/login.html')
 
-# View for Athlete Account Creation
-def athlete_signup(request):
-    if request.method == 'POST':
-        form = SignupForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            email = form.cleaned_data['email']
-            password1 = form.cleaned_data['password1']
-            password2 = form.cleaned_data['password2']
-            
-            if password1 == password2:
-                user = get_user_model().objects.create_user(
-                    email=email,
-                    username=username,
-                    password=password1
-                )
-                login(request, user)
-                return redirect('dashboard')
-            else:
-                return render(request, 'website/signup.html', {'error': 'Passwords do not match'})
-    else:
-        form = SignupForm()
-    return render(request, 'website/signup.html', {'form': form})
-
-def athlete_signup(request):
+# View for User Signup
+def user_signup(request):
     if request.method == "POST":
         form = SignupForm(request.POST)
         if form.is_valid():
-            # Extract the valid form data
             username = form.cleaned_data["username"]
             email = form.cleaned_data["email"]
             password = form.cleaned_data["password1"]
-            gender = form.cleaned_data["gender"]
-            weight = form.cleaned_data["weight"]
-            height = form.cleaned_data["height"]
-            dob = form.cleaned_data["dob"]
-            biography = form.cleaned_data.get("biography", "")
-            smLinks = form.cleaned_data.get("smLinks", "")
+            # gender = form.cleaned_data["gender"]
+            # weight = form.cleaned_data["weight"]
+            # height = form.cleaned_data["height"]
+            # dob = form.cleaned_data["dob"]
+            # biography = form.cleaned_data.get("biography", "")
+            # smLinks = form.cleaned_data.get("smLinks", "")
 
-            # Create user with required fields
-            user = Athlete.objects.create_user(
-                email=email,
-                username=username,
-                gender=gender,
-                weight=weight,
-                height=height,
-                dob=dob,
-                password=password,
-                biography=biography,
-                smLinks=smLinks,
-            )
+            # Create user
+            user = User.objects.create_user(username=username, email=email, password=password)
 
-            login(request, user)  # Log the user in after signup
-            return redirect('athlete_matches')  # Redirect to home page or dashboard
+            # Create profile
+            # AthleteProfile.objects.create(
+            #     user=user,
+            #     gender=gender,
+            #     weight=weight,
+            #     height=height,
+            #     dob=dob,
+            #     biography=biography,
+            #     smLinks=smLinks
+            # )
+
+            login(request, user)  # Log the user in
+            return redirect('athlete_matches')
 
     else:
         form = SignupForm()
 
     return render(request, 'website/signup.html', {"form": form})
 
-# matches table function
-
+# Matches table function
 def event_list(request):
     matches = Match.objects.all()
-    athletes = Athlete.objects.all()
+    users = User.objects.all()
 
     # Get filter values from request
     age_filter = request.GET.get('age', '')
@@ -96,7 +70,7 @@ def event_list(request):
     event_filter = request.GET.get('event', '')
     athlete_search = request.GET.get('athlete', '')
 
-    # Apply filters if they exist
+    # Apply filters
     if age_filter:
         matches = matches.filter(age=age_filter)
     if gender_filter:
@@ -104,48 +78,44 @@ def event_list(request):
     if season_filter:
         matches = matches.filter(season=season_filter)
     if event_filter:
-        matches = matches.filter(eventName=event_filter)
+        matches = matches.filter(event__eventName=event_filter)
     if athlete_search:
-        matches = matches.filter(athlete__name__icontains=athlete_search)
+        matches = matches.filter(athlete__username__icontains=athlete_search)
 
-    # Context to pass to the template
     context = {
         'matches': matches,
-        'athletes': athletes,
+        'users': users,
         'age_filter': age_filter,
         'gender_filter': gender_filter,
         'season_filter': season_filter,
         'event_filter': event_filter,
         'athlete_search': athlete_search,
-        'age_choices': Match.AGES,  # Get all age choices
-        'event_choices': Event.EVENTS,  # Get all event choices
-        'season_choices': Match.SEASON,  # Get all season choices
+        'age_choices': Match.AGES,
+        'event_choices': Event.EVENTS,
+        'season_choices': Match.SEASON,
     }
 
     return render(request, 'website/event_list.html', context)
 
 # Athlete Matches function
-
 @login_required
 def athlete_matches(request):
-  # Get the athlete's matches
-	athlete = request.user
-	matches = Match.objects.filter(athlete=athlete)
+    user = request.user
+    matches = Match.objects.filter(athlete=user)
 
-	# Add a match
-	if request.method == 'POST':
-		form = MatchForm(request.POST)
-		if form.is_valid():
-			# Associate the logged-in athlete with the new match
-			new_match = form.save(commit=False)
-			new_match.athlete = athlete  # Set the logged-in athlete
-			new_match.save()
-			return redirect('athlete_matches')  # Redirect back to the matches page
-	else:
-		form = MatchForm()
+    if request.method == 'POST':
+        form = MatchForm(request.POST)
+        if form.is_valid():
+            new_match = form.save(commit=False)
+            new_match.athlete = user
+            new_match.save()
+            return redirect('athlete_matches')
 
-	return render(request, 'website/athlete_matches.html', {'matches': matches, 'form': form, 'athlete': athlete})
+    else:
+        form = MatchForm()
+
+    return render(request, 'website/athlete_matches.html', {'matches': matches, 'form': form, 'user': user})
 
 def logout_view(request):
     logout(request)
-    return redirect('login')  # Redirect to the login page or homepage after logout
+    return redirect('login')
