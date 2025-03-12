@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 
 class AthleteManager(BaseUserManager):
@@ -37,6 +37,7 @@ class Athlete(AbstractBaseUser):
     smLinks = models.URLField(max_length=500)
     height = models.DecimalField(max_digits=4, decimal_places=2)
     dob = models.DateField(auto_now=False, auto_now_add=False)
+    password = models.CharField(max_length=128, default='helloworld1')
     
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)  # True if the athlete is a staff (admin)
