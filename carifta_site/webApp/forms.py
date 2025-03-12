@@ -6,6 +6,29 @@ class MatchForm(forms.ModelForm):
         model = Match
         fields = ['event', 'age', 'season', 'mark', 'windSpeed', 'place', 'club', 'date', 'location', 'personalBest']
 
+        labels = {
+            'event': 'Select Event',
+            'age': 'Select Age Category',
+            'season': 'Season (Year)',
+            'mark': 'Performance Mark (e.g., 10.25s, 5.50m)',
+            'windSpeed': 'Wind Speed (m/s)',
+            'place': 'Placement (e.g., 1st, 2nd, 3rd)',
+            'club': 'Club Name (Optional)',
+            'date': 'Date of Match (YYYY-MM-DD)',
+            'location': 'Location of Event',
+            'personalBest': 'Personal Best Performance',
+        }
+
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'mark': forms.TextInput(attrs={'placeholder': 'Enter mark in seconds/meters'}),
+            'windSpeed': forms.NumberInput(attrs={'step': '0.1', 'placeholder': 'Enter wind speed in m/s'}),
+            'place': forms.TextInput(attrs={'placeholder': 'e.g., 1st, 2nd, 3rd'}),
+            'club': forms.TextInput(attrs={'placeholder': 'Optional'}),
+            'location': forms.TextInput(attrs={'placeholder': 'Enter event location'}),
+            'personalBest': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'Enter best mark'}),
+        }
+
 class SignupForm(forms.ModelForm):
     # Required fields are already specified in the model (username, email, etc.)
     # We will just make sure that the `biography` and `smLinks` are not mandatory.
@@ -16,7 +39,7 @@ class SignupForm(forms.ModelForm):
     class Meta:
         model = Athlete
         fields = [
-            'username', 'email', 'gender', 'weight', 'height', 'dob', 
+            'name', 'email', 'username', 'gender', 'weight', 'height', 'dob', 
             'biography', 'smLinks'  # biography and smLinks are optional
         ]
     

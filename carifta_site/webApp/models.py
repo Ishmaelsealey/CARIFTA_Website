@@ -5,23 +5,35 @@ from django.utils.translation import gettext_lazy as _
 class AthleteManager(BaseUserManager):
     """Manager for Athlete model"""
     
-    def create_user(self, email, username, password=None, **extra_fields):
-        """Create and return a regular athlete with an email and password"""
+    def create_user(self, email, username, gender, weight, height, dob, password=None, **extra_fields):
+        """Create and return a regular athlete with required fields"""
         if not email:
             raise ValueError(_('The Email field must be set'))
+        if not username:
+            raise ValueError(_('The Username field must be set'))
+
         email = self.normalize_email(email)
-        user = self.model(email=email, username=username, **extra_fields)
-        user.set_password(password)
+        user = self.model(
+            email=email,
+            username=username,
+            gender=gender,
+            weight=weight,
+            height=height,
+            dob=dob,
+            **extra_fields
+        )
+        user.set_password(password)  # Hash password
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, password=None, **extra_fields):
-        """Create and return a superuser with an email, username, and password"""
+    def create_superuser(self, email, username, gender, weight, height, dob, password=None, **extra_fields):
+        """Create and return a superuser with required fields"""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        return self.create_user(email, username, password, **extra_fields)
+        
+        return self.create_user(email, username, gender, weight, height, dob, password, **extra_fields)
 
-class Athlete(AbstractBaseUser):
+class Athlete(AbstractBaseUser, PermissionsMixin):
     GENDER = [
         ("MALE", "Male"),
         ("FEMALE", "Female")
@@ -33,24 +45,25 @@ class Athlete(AbstractBaseUser):
     username = models.CharField(max_length=100, unique=True)
     gender = models.CharField(max_length=6, choices=GENDER)
     weight = models.DecimalField(max_digits=6, decimal_places=2)
-    biography = models.CharField(max_length=1000)
-    smLinks = models.URLField(max_length=500)
     height = models.DecimalField(max_digits=4, decimal_places=2)
-    dob = models.DateField(auto_now=False, auto_now_add=False)
-    password = models.CharField(max_length=128, default='helloworld1')
+    dob = models.DateField()
     
+    # Optional fields
+    biography = models.CharField(max_length=1000, blank=True, null=True)
+    smLinks = models.URLField(max_length=500, blank=True, null=True)
+
+    # Authentication fields
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)  # True if the athlete is a staff (admin)
-    
-    # Add necessary fields for authentication
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']  # Email and username are required, but password is not (handled by AbstractBaseUser)
 
     objects = AthleteManager()
 
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['name', 'email', 'gender', 'weight', 'height', 'dob']  # These must be provided
+
     def __str__(self):
-        return f"Athlete: {self.username}"  # Displays the athlete's name
-    
+        return f"Athlete: {self.username}"  
+
     def get_full_name(self):
         return self.username
 
