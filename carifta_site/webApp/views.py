@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Match, Event, AthleteProfile
+from .models import Match, AthleteProfile
 from .forms import MatchForm, SignupForm
 
 # View for User Login
@@ -91,7 +91,7 @@ def event_list(request):
         'event_filter': event_filter,
         'athlete_search': athlete_search,
         'age_choices': Match.AGES,
-        'event_choices': Event.EVENTS,
+        'event_choices': Match.EVENTS,
         'season_choices': Match.SEASON,
     }
 
@@ -101,20 +101,27 @@ def event_list(request):
 @login_required
 def athlete_matches(request):
     user = request.user
-    matches = Match.objects.filter(athlete=user)
+
+    try:
+        athlete = AthleteProfile.objects.get(user=user)
+    except AthleteProfile.DoesNotExist:
+        athlete = None
+    
+    matches = Match.objects.filter(athlete=athlete)
 
     if request.method == 'POST':
         form = MatchForm(request.POST)
         if form.is_valid():
             new_match = form.save(commit=False)
-            new_match.athlete = user
+            new_match.athlete = athlete
+            new_match.gender = athlete.gender
             new_match.save()
             return redirect('athlete_matches')
 
     else:
         form = MatchForm()
 
-    return render(request, 'website/athlete_matches.html', {'matches': matches, 'form': form, 'user': user})
+    return render(request, 'website/athlete_matches.html', {'matches': matches, 'form': form, 'athlete': athlete})
 
 def logout_view(request):
     logout(request)

@@ -8,6 +8,7 @@ class AthleteProfile(models.Model):
     ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    name = models.CharField(max_length=50, null=False, blank=False)
     gender = models.CharField(max_length=6, choices=GENDER)
     weight = models.DecimalField(max_digits=6, decimal_places=2)
     height = models.DecimalField(max_digits=4, decimal_places=2)
@@ -18,7 +19,29 @@ class AthleteProfile(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Profile"
 
-class Event(models.Model):
+class Match(models.Model):
+    AGES = [
+        ("OPEN", "Open"),
+        ("U-23", "Under-23"),
+        ("U-20", "Under-20"),
+        ("U-18", "Under-18"),
+        ("U-17", "Under-17"),
+        ("U-15", "Under-15"),
+        ("U-13", "Under-13"),
+        ("U-11", "Under-11"),
+        ("U-09", "Under-9"),
+    ]
+
+    SEASON = [
+        (2025, "2025"),
+        (2024, "2024"),
+        (2023, "2023"),
+        (2022, "2022"),
+        (2021, "2021"),
+        (2020, "2020"),
+        (2019, "2019"),
+    ]
+
     EVENTS = [
         ("60M", "60 Meters"),
         ("80M", "80 Meters"),
@@ -58,49 +81,19 @@ class Event(models.Model):
         ("BT", "Ball Throw"),
     ]
 
-    eventID = models.AutoField(primary_key=True)
-    eventName = models.CharField(max_length=200, choices=EVENTS)
-    description = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.eventName
-
-class Match(models.Model):
-    AGES = [
-        ("OPEN", "Open"),
-        ("U-23", "Under-23"),
-        ("U-20", "Under-20"),
-        ("U-18", "Under-18"),
-        ("U-17", "Under-17"),
-        ("U-15", "Under-15"),
-        ("U-13", "Under-13"),
-        ("U-11", "Under-11"),
-        ("U-09", "Under-9"),
-    ]
-
-    SEASON = [
-        (2025, "2025"),
-        (2024, "2024"),
-        (2023, "2023"),
-        (2022, "2022"),
-        (2021, "2021"),
-        (2020, "2020"),
-        (2019, "2019"),
-    ]
-
     matchID = models.AutoField(primary_key=True)
-    athlete = models.ForeignKey(User, on_delete=models.CASCADE, related_name="matches", null=True)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="matches", null=True)
+    athlete = models.ForeignKey(AthleteProfile, on_delete=models.CASCADE, related_name="matches")
+    event = models.CharField(max_length=20, choices=EVENTS, null=True)
     windSpeed = models.DecimalField(max_digits=3, decimal_places=1)
     place = models.CharField(max_length=200)
-    date = models.DateField()
+    date = models.DateField(blank=False)
     location = models.CharField(max_length=200)
     mark = models.CharField(max_length=10)
     age = models.CharField(max_length=5, choices=AGES)
     club = models.CharField(max_length=200, default=None, blank=True, null=True)
     personalBest = models.DecimalField(max_digits=10, decimal_places=2)
     season = models.IntegerField(choices=SEASON)
-    gender = models.CharField(max_length=6, choices=AthleteProfile.GENDER, default="MALE")
+    gender = models.CharField(max_length=6, choices=AthleteProfile.GENDER)
 
     def __str__(self):
-        return f"Match: {self.athlete.username} - {self.event.eventName}"
+        return f"Match: {self.athlete.name} - {self.event}"
