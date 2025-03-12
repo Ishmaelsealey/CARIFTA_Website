@@ -9,10 +9,10 @@
 {% block body %}
 <h2>Your Matches</h2>
 
-<form action="{% url 'logout' %}" method="post">
-    {% csrf_token %}
-    <button type="submit">Sign Out</button>
-</form>
+<div>
+    Name: {{ athlete.username }} <br>
+    DOB: {{ athlete.dob }}
+</div>
 
 <table>
     <tr>
@@ -37,11 +37,13 @@
     {% endfor %}
 </table>
 
-<h3>Add New Match</h3>
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Add Match</button>
-</form>
+<section class="new_match">
+    <h3>Add New Match</h3>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add Match</button>
+    </form>
+</section>
 
 {% endblock %}

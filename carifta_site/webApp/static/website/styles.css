@@ -9,6 +9,7 @@ body {
     background-color: #f4f4f4;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
 }
 
 .container {
@@ -34,11 +35,10 @@ label {
     margin-bottom: 5px;
 }
 
-input[type="text"], input[type="password"] {
+input, select {
     width: 100%;
-    padding: 10px;
     font-size: 14px;
-    border: 1px solid #ddd;
+    border: 1px solid black;
     border-radius: 5px;
 }
 
@@ -54,6 +54,7 @@ button {
 
 button:hover {
     background-color: #0056b3;
+    cursor: pointer;
 }
 
 .error {
@@ -79,4 +80,69 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+/* Footer styles */
+.footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    margin-top: auto;
+}
+
+/* Navbar styles */
+.navbar {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    background-color: #333;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 18px;
+}
+
+.navbar a:hover {
+    text-decoration: underline;
+}
+
+table {
+    width: 80vw;
+    margin: 1em auto;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}
+
+.new_match {
+    margin: 2em;
+    padding: 0;
+}
+
+.new_match form {
+    width: 50vw;
+}
+
+.new_match form p {
+    margin: 1em 0;
+}
+
+.new_match form p input, select {
+    width: 100%;
+    padding: 0.8em 1.2em;
 }

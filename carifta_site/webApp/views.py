@@ -129,7 +129,7 @@ def event_list(request):
 @login_required
 def athlete_matches(request):
   # Get the athlete's matches
-	athlete = request.user  # Assuming the user model has a related 'athlete'
+	athlete = request.user
 	matches = Match.objects.filter(athlete=athlete)
 
 	# Add a match
@@ -144,7 +144,7 @@ def athlete_matches(request):
 	else:
 		form = MatchForm()
 
-	return render(request, 'website/athlete_matches.html', {'matches': matches, 'form': form})
+	return render(request, 'website/athlete_matches.html', {'matches': matches, 'form': form, 'athlete': athlete})
 
 def logout_view(request):
     logout(request)
