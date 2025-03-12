@@ -10,13 +10,58 @@
         <form method="POST">
             {% csrf_token %}
             <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required class="form-control">
+            </div>
+
+            <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required class="form-control">
             </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" required class="form-control">
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="weight">Weight (kg)</label>
+                <input type="number" step="0.01" id="weight" name="weight" required class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="height">Height (cm)</label>
+                <input type="number" step="0.01" id="height" name="height" required class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob" name="dob" required class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="biography">Biography (Optional)</label>
+                <textarea id="biography" name="biography" class="form-control"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="smLinks">Social Media Links (Optional)</label>
+                <input type="url" id="smLinks" name="smLinks" class="form-control">
+            </div>
+
             <div class="form-group">
                 <label for="password1">Password</label>
                 <input type="password" id="password1" name="password1" required class="form-control">
             </div>
+
             <div class="form-group">
                 <label for="password2">Confirm Password</label>
                 <input type="password" id="password2" name="password2" required class="form-control">
