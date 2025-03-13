@@ -34,9 +34,17 @@ class SignupForm(forms.ModelForm):
     password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
     password2 = forms.CharField(label="Confirm Password", widget=forms.PasswordInput)
 
+    name = forms.CharField(label="Full Name", max_length=50)
+    gender = forms.ChoiceField(choices=AthleteProfile.GENDER, widget=forms.Select)
+    weight = forms.DecimalField(label="Weight (kg)", max_digits=6, decimal_places=2)
+    height = forms.DecimalField(label="Height (m)", max_digits=4, decimal_places=2)
+    dob = forms.DateField(label="Date of Birth", widget=forms.DateInput(attrs={'type': 'date'}))
+    biography = forms.CharField(label="Biography", widget=forms.Textarea, required=False)
+    smLinks = forms.URLField(label="Social Media Link", required=False)
+
     class Meta:
         model = User
-        fields = ['username', 'email']  # Only required fields for the user model (username and email)
+        fields = ['username', 'email']
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -46,26 +54,28 @@ class SignupForm(forms.ModelForm):
         return password2
 
     def save(self, commit=True):
-        user = super().save(commit=False)
+        """ 
+        1. Save the user instance 
+        2. Create and link the AthleteProfile to the user 
+        """
+
+        user = super().save(commit=False) # Don't commit yet, we need to set the password
         user.set_password(self.cleaned_data["password1"])
+        
         if commit:
-            user.save()
+            user.save() # Save the User first so we can link it to AthleteProfile
 
-        # Create an AthleteProfile for the new user
-        gender = self.cleaned_data.get("gender")
-        weight = self.cleaned_data.get("weight")
-        height = self.cleaned_data.get("height")
-        dob = self.cleaned_data.get("dob")
-        biography = self.cleaned_data.get("biography", "")
-        smLinks = self.cleaned_data.get("smLinks", "")
+            # Create the AthleteProfile and link it to user
+            athlete_profile = AthleteProfile.objects.create(
+                user=user,
+                name=self.cleaned_data["name"],
+                gender=self.cleaned_data["gender"],
+                weight=self.cleaned_data["weight"],
+                height=self.cleaned_data["height"],
+                dob=self.cleaned_data["dob"],
+                biography=self.cleaned_data["biography"],
+                smLinks=self.cleaned_data["smLinks"]
+            )
+            athlete_profile.save() # ensure it's saved
 
-        AthleteProfile.objects.create(
-            user=user,
-            gender=gender,
-            weight=weight,
-            height=height,
-            dob=dob,
-            biography=biography,
-            smLinks=smLinks
-        )
         return user

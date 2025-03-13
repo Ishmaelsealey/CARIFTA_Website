@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import Match, AthleteProfile
@@ -26,30 +25,7 @@ def user_signup(request):
     if request.method == "POST":
         form = SignupForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data["username"]
-            email = form.cleaned_data["email"]
-            password = form.cleaned_data["password1"]
-            # gender = form.cleaned_data["gender"]
-            # weight = form.cleaned_data["weight"]
-            # height = form.cleaned_data["height"]
-            # dob = form.cleaned_data["dob"]
-            # biography = form.cleaned_data.get("biography", "")
-            # smLinks = form.cleaned_data.get("smLinks", "")
-
-            # Create user
-            user = User.objects.create_user(username=username, email=email, password=password)
-
-            # Create profile
-            # AthleteProfile.objects.create(
-            #     user=user,
-            #     gender=gender,
-            #     weight=weight,
-            #     height=height,
-            #     dob=dob,
-            #     biography=biography,
-            #     smLinks=smLinks
-            # )
-
+            user = form.save()
             login(request, user)  # Log the user in
             return redirect('athlete_matches')
 
