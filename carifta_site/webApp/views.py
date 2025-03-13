@@ -54,9 +54,9 @@ def event_list(request):
     if season_filter:
         matches = matches.filter(season=season_filter)
     if event_filter:
-        matches = matches.filter(event__eventName=event_filter)
+        matches = matches.filter(event=event_filter)
     if athlete_search:
-        matches = matches.filter(athlete__username__icontains=athlete_search)
+        matches = matches.filter(athlete__name__icontains=athlete_search)
 
     context = {
         'matches': matches,
