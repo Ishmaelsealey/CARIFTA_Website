@@ -21,30 +21,37 @@ class MatchForm(forms.ModelForm):
         }
 
         widgets = {
+            'event': forms.Select(attrs={'class': 'form-control'}),
+            'age': forms.Select(attrs={'class': 'form-control'}),
+            'season': forms.Select(attrs={'class': 'form-control'}),
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'mark': forms.TextInput(attrs={'placeholder': 'Enter mark in seconds/meters'}),
-            'windSpeed': forms.NumberInput(attrs={'step': '0.1', 'placeholder': 'Enter wind speed in m/s'}),
-            'place': forms.TextInput(attrs={'placeholder': 'e.g., 1st, 2nd, 3rd'}),
-            'club': forms.TextInput(attrs={'placeholder': 'Optional'}),
-            'location': forms.TextInput(attrs={'placeholder': 'Enter event location'}),
-            'personalBest': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'Enter best mark'}),
+            'mark': forms.TextInput(attrs={'placeholder': 'Enter mark in seconds/meters', 'class': 'form-control'}),
+            'windSpeed': forms.NumberInput(attrs={'step': '0.1', 'placeholder': 'Enter wind speed in m/s', 'class': 'form-control'}),
+            'place': forms.TextInput(attrs={'placeholder': 'e.g., 1st, 2nd, 3rd', 'class': 'form-control'}),
+            'club': forms.TextInput(attrs={'placeholder': 'Optional', 'class': 'form-control'}),
+            'location': forms.TextInput(attrs={'placeholder': 'Enter event location', 'class': 'form-control'}),
+            'personalBest': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'Enter best mark', 'class': 'form-control'}),
         }
 
 class SignupForm(forms.ModelForm):
-    password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
-    password2 = forms.CharField(label="Confirm Password", widget=forms.PasswordInput)
+    password1 = forms.CharField(label="Password", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    password2 = forms.CharField(label="Confirm Password", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
-    name = forms.CharField(label="Full Name", max_length=50)
-    gender = forms.ChoiceField(choices=AthleteProfile.GENDER, widget=forms.Select)
-    weight = forms.DecimalField(label="Weight (kg)", max_digits=6, decimal_places=2)
-    height = forms.DecimalField(label="Height (m)", max_digits=4, decimal_places=2)
-    dob = forms.DateField(label="Date of Birth", widget=forms.DateInput(attrs={'type': 'date'}))
-    biography = forms.CharField(label="Biography", widget=forms.Textarea, required=False)
-    smLinks = forms.URLField(label="Social Media Link", required=False)
-
+    name = forms.CharField(label="Full Name", max_length=50, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    gender = forms.ChoiceField(choices=AthleteProfile.GENDER, widget=forms.Select(attrs={'class': 'form-control'}))
+    weight = forms.DecimalField(label="Weight (kg)", max_digits=6, decimal_places=2, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    height = forms.DecimalField(label="Height (m)", max_digits=4, decimal_places=2, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    dob = forms.DateField(label="Date of Birth", widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
+    biography = forms.CharField(label="Biography", required=False, widget=forms.Textarea(attrs={'class': 'form-control'}))
+    smLinks = forms.URLField(label="Social Media Link", required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    
     class Meta:
         model = User
         fields = ['username', 'email']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+        }
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
