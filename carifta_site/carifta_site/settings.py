@@ -27,7 +27,8 @@ DEBUG = True
 
 import os
 
-ALLOWED_HOSTS = [os.environ.get('RENDER_EXTERNAL_HOSTNAME', 'webApp.onrender.com')]
+# ALLOWED_HOSTS = [os.environ.get('RENDER_EXTERNAL_HOSTNAME', 'webApp.onrender.com')]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -86,7 +87,12 @@ WSGI_APPLICATION = 'carifta_site.wsgi.application'
 import dj_database_url
 
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+    'default': dj_database_url.config(
+		# default=os.environ.get('DATABASE_URL'),
+		default='sqlite:///db.sqlite3',
+		conn_max_age=600,
+		ssl_require=True
+	)
 }
 
 
