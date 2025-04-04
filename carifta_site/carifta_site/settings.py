@@ -91,7 +91,7 @@ DATABASES = {
 		# default=os.environ.get('DATABASE_URL'),
 		default='sqlite:///db.sqlite3',
 		conn_max_age=600,
-		ssl_require=True
+		ssl_require=os.environ.get('RENDER', None) is not None  # Only require SSL on Render
 	)
 }
 
