@@ -58,8 +58,83 @@ def event_list(request):
     if athlete_search:
         matches = matches.filter(athlete__name__icontains=athlete_search)
 
+    # Sort matches based on event type (assume you have a way to determine event type)
+    event_types = {
+        # Sprint races - lower is better
+        "60M": "ascending",
+        "80M": "ascending",
+        "100M": "ascending",
+        "200M": "ascending",
+        "400M": "ascending",
+        "800M": "ascending",
+        "1000M": "ascending",
+        "1200M": "ascending",
+        "1500M": "ascending",
+        "3000M": "ascending",
+        "5000M": "ascending",
+        "10000M": "ascending",
+        
+        # Hurdles - lower is better
+        "60H": "ascending",
+        "80H": "ascending",
+        "100H": "ascending",
+        "110H": "ascending",
+        "400H": "ascending",
+        
+        # Steeplechase - lower is better
+        "3000SC": "ascending",
+        
+        # Relays - lower is better
+        "4100R": "ascending",
+        "4400R": "ascending",
+        
+        # Long-distance races - lower is better
+        "HM": "ascending",   # Half Marathon
+        "M": "ascending",    # Marathon
+
+        # Walk races - lower is better
+        "20KW": "ascending",
+        
+        # Combined events - higher is better
+        "PENT": "descending",  # Pentathlon
+        "HEPT": "descending",  # Heptathlon
+        "OCTA": "descending",  # Octathlon
+        "DECA": "descending",  # Decathlon
+
+        # Jumping events - higher is better
+        "HJ": "descending",  # High Jump
+        "LJ": "descending",  # Long Jump
+        "TRJ": "descending", # Triple Jump
+        "PV": "descending",  # Pole Vault
+
+        # Throwing events - higher is better
+        "DISCUS": "descending",
+        "JAVE": "descending",  # Javelin
+        "HAM": "descending",   # Hammer
+        "SHOT": "descending",  # Shot Put
+        "BT": "descending",    # Ball Throw
+    }
+
+    if event_filter and event_filter in event_types:
+        if event_types[event_filter] == "ascending":
+            matches = matches.order_by("mark")  # Lower is better (race times)
+        else:
+            matches = matches.order_by("-mark")  # Higher is better (jump distances, throws)
+
+    # Assign ranks based on sorted order
+    ranked_matches = []
+    previous_mark = None
+    rank = 0
+
+    for i, match in enumerate(matches):
+        if previous_mark != match.mark:
+            rank = i + 1  # Assign new rank if performance differs
+        previous_mark = match.mark
+        match.rank = rank  # Attach rank dynamically
+        ranked_matches.append(match)
+
     context = {
-        'matches': matches,
+        'matches': ranked_matches,
         'users': users,
         'age_filter': age_filter,
         'gender_filter': gender_filter,
